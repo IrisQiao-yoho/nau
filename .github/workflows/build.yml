@@ -20,7 +20,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v6
       - name: Run Build Wrapper
         run: |
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make clean all
       - name: Show Build Dir
         run: ls ${{ env.BUILD_WRAPPER_OUT_DIR }}; cat ${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json
       - name: SonarQube Scan
