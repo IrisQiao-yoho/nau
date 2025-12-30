@@ -15,7 +15,7 @@ static int			gw_update;
 static int			ap_arp_t = 10; // ARP -A扫描周期10秒
 static unsigned int	gw_min_t = 3;  // 网关最短下发时间
 static unsigned int	gw_max_t = 10; // 网关最长下发时间
-static unsigned int	tm_sec_t = 60; // 记录超时时间
+static unsigned int	tm_sec_t = 3600; // 记录超时时间
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,8 @@ nau_ap_update(void)
 		ifup4 = nau_iface_6to4(nau_ifu_v6, ifuip);
 	}
 
-	// Step4: 生成本地NAU表
+	// Step4: 生成本地NAU�
+	std::cout << nau_ifd_ip << ifup4 << ifup6 << nau_proto << nau_ap_id << std::endl;
 	ap.tm.push_back({nau_ifd_ip, "", ifup4, ifup6, nau_proto, nau_ap_id});
 	for(const auto& tm : tms) {
 
@@ -232,6 +233,11 @@ nau_ap_upload(
 	pthread_mutex_lock(&db_mutex);
 	// Step2: 更新远端表
 	nau_tm_update(NAU_DB_RTB, nau_ap_id, tms);
+
+	std::vector<UNIT> tmsR = nau_db_query_for_gre(NAU_DB_RTB);
+    std::vector<UNIT> tmsL = nau_db_query_for_gre(NAU_DB_LTB);
+	nau_json_tm_save_gre("/home/remote_test_gre.json", tmsR);
+    nau_json_tm_save_gre("/home/local_test_gre.json", tmsL);
 
 	// Step3: 老化远端表
 	nau_tm_expire(NAU_DB_RTB, tm_sec_t);

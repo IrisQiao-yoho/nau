@@ -158,3 +158,89 @@ EXIT:
 	return items;
 }
 
+int
+nau_json_tm_save_gre(
+	const char		*fname,
+	std::vector<UNIT>& items)
+{
+	json		new_data;
+
+	// 创建数据
+	new_data["tm"] = json::array();
+	for(const auto& item : items) {
+
+		json dict;
+		dict["uidip"] = item.UIDIP;
+		dict["uidmac"]= item.UIDMAC;
+		dict["ifup4"] = item.IFUP4;
+		dict["ifup6"] = item.IFUP6;
+		dict["sat_protocol"] = item.sat_protocol;
+		dict["nauid"] = item.NAU_ID;
+		dict["ctime"] = item.CTIME;
+		dict["utime"] = item.UTIME;
+		new_data["tm"].push_back(dict);
+	}
+
+	// 打开输出文件流
+	std::ofstream out_file(fname);
+	if( !out_file.is_open() ) {
+
+		std::cerr << "Create file failed!"<< std::endl;
+		return -1;
+	}
+	// 写入文件, 缩进为4个空格
+	out_file << std::setw(4) << new_data << std::endl;
+	return 0;
+}
+
+std::vector<UNIT>
+nau_json_tm_load_gre(
+	const char		*fname)
+{
+	std::vector<UNIT>	items;
+
+	// Step1: 打开JSON文件
+	std::ifstream input_file(fname);
+	if( !input_file.is_open() ) {
+
+		std::cerr << "Open the file failed!" << fname << std::endl;
+		goto EXIT;
+	}
+
+	// 解析数据
+	try {
+
+		json data;
+		input_file >> data;
+
+		if(data.contains("tm") && data["tm"].is_array()) {
+
+			const json& tm_array = data["tm"];
+			for(const auto& tm : tm_array) {
+
+				if( !tm.is_object() ) {
+
+					continue;
+				}
+				std::string 	UIDIP = tm.value("uidip", "N/A");
+				std::string 	UIDMAC= tm.value("uidmac", "N/A");
+				std::string 	IFUP4 = tm.value("ifup4", "N/A");
+				std::string 	IFUP6 = tm.value("ifup6", "N/A");
+				std::string 	sat_protocol = tm.value("sat_protocol", "N/A");
+				std::string 	NAU_ID = tm.value("nauid", "N/A");
+				std::string 	CTIME = tm.value("ctime", "N/A");
+				std::string 	UTIME = tm.value("utime", "N/A");
+				items.push_back({UIDIP, UIDMAC, IFUP4, IFUP6, sat_protocol, NAU_ID, CTIME, UTIME});
+			}
+		}
+	} catch (const json::parse_error& e) {
+
+		std::cerr << "Error: JSON parsing failed:" << e.what() << std::endl;
+	} catch (const json::out_of_range& e) {
+
+		std::cerr << "Key is not exist!" << e.what() << std::endl;
+	}
+
+EXIT:
+	return items;
+}

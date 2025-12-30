@@ -16,6 +16,8 @@ typedef struct _NAU_DB_TM {
 	char		ifup6[64];
 	char		proto[4];
 	char		nauid[8];
+	char		ctime[32];
+	char		utime[32];
 
 	struct _NAU_DB_TM *next;
 }NAU_DB_TM, *PNAU_DB_TM;
@@ -62,6 +64,9 @@ std::vector<NAU_ITEM_TM>
 nau_db_query(
 	const char		*tbl);
 
+std::vector<UNIT>
+nau_db_query_for_gre(
+	const char		*tb);
 
 #endif
 

@@ -28,6 +28,14 @@ std::vector<NAU_ITEM_TM>
 nau_json_tm_load(
 	const char		*fname);
 
+int
+nau_json_tm_save_gre(
+	const char		*fname,
+	std::vector<UNIT>& items);
+
+std::vector<UNIT>
+nau_json_tm_load_gre(
+	const char		*fname);
 
 #endif
 
